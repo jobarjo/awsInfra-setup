@@ -17,7 +17,9 @@ None.
 
 This project is deployed via AWS Code pipeline.
 
-A github webhook has been configured so that any push to the repo will trigger the pipeline.
+Simpliest way is to launch the CF stack `00-pipeline.yml` via CloudFormation, the other stacks will be deployed automatically.
+
+A github webhook has been configured so that any push to the repo will then trigger the pipeline to update.
 
 ## Monitoring
 
