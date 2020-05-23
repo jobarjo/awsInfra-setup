@@ -119,19 +119,19 @@ Outputs:
     Description: The ID of the VPC that this stack is deployed in
     Value: !Ref 'VPC'
     Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'VPCId' ] ]
+      Name: !Sub "${AWS::StackName}:VPCId"
   PublicSubnetOne:
     Description: Public subnet one
     Value: !Ref 'PublicSubnetOne'
     Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PublicSubnetOne' ] ]
+      Name: !Sub "${AWS::StackName}:PublicSubnetOne"
   PublicSubnetTwo:
     Description: Public subnet two
     Value: !Ref 'PublicSubnetTwo'
     Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PublicSubnetTwo' ] ]
+      Name: !Sub "${AWS::StackName}:PublicSubnetTwo"
   PublicSubnetThree:
     Description: Public subnet three
     Value: !Ref 'PublicSubnetThree'
     Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PublicSubnetThree' ] ]
+      Name: !Sub "${AWS::StackName}:PublicSubnetThree"
