@@ -1,0 +1,124 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "be-aws-networking deployment pipeline"
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: "be-aws-networking"
+  BranchName:
+    Type: String
+    Description: "The dev / deployment environment"
+    Default: master
+    AllowedValues:
+      - "master"
+  Repo:
+    Type: String
+    Default: "be-aws-networking"
+  GithubOAuthToken:
+    Description: "The github OAUTH token to give codepipeline access to the gihub repo. To be provided when launching pipeline on the CLI - see https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html" 
+    Type: String
+
+Resources:
+  PipelineWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties: 
+      Authentication: "UNAUTHENTICATED"
+      AuthenticationConfiguration: {}
+      Filters: 
+        - JsonPath: "$.ref"
+          MatchEquals: !Sub "refs/heads/${BranchName}"
+      Name: !Sub "${ProjectName}-codePipelineWebhook"
+      TargetAction: "SourceCode"
+      TargetPipeline: !Ref CodePipeline
+      TargetPipelineVersion: !GetAtt CodePipeline.Version
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !Ref ArtifactStoreS3Bucket
+        Type: S3
+      Name: !Sub "${ProjectName}-codePipeline"
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      RestartExecutionOnUpdate: true
+      Stages:
+        - Name: "Source"
+          Actions:
+            - Name: "SourceCode"
+              Namespace: SourceVariables
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: "1"
+              Configuration:
+                Owner: "wantedmedia"
+                Repo: !Ref Repo
+                Branch: !Ref BranchName
+                OAuthToken: !Ref GithubOAuthToken
+                PollForSourceChanges: False
+              OutputArtifacts:
+                - Name: !Ref ProjectName
+              RunOrder: 1
+        - Name: "Deploy-Infrastructure"
+          Actions:
+            - Name: "Deploy-Infrastructure"
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: !Sub "${ProjectName}-infrastructure"
+                TemplatePath: !Sub "${ProjectName}::aws/01-infrastructure.yml"
+                RoleArn: !GetAtt DeployRole.Arn
+              InputArtifacts:
+                - Name: !Ref ProjectName
+              RunOrder: 1
+
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: code-pipeline
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - cloudwatch:*
+                  - cloudformation:*
+                  - iam:PassRole
+                  - codebuild:*
+                  - codestar-connections:*
+                Resource: "*"
+
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  ArtifactStoreS3Bucket:
+    Type: AWS::S3::Bucket
