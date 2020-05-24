@@ -20,19 +20,6 @@ Parameters:
     Type: String
 
 Resources:
-  PipelineWebhook:
-    Type: AWS::CodePipeline::Webhook
-    Properties: 
-      Authentication: "UNAUTHENTICATED"
-      AuthenticationConfiguration: {}
-      Filters: 
-        - JsonPath: "$.ref"
-          MatchEquals: "refs/heads/{Branch}"
-      Name: !Sub "${ProjectName}-codePipelineWebhook"
-      TargetAction: "SourceCode"
-      TargetPipeline: !Ref CodePipeline
-      TargetPipelineVersion: !GetAtt CodePipeline.Version
-
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -77,6 +64,19 @@ Resources:
               InputArtifacts:
                 - Name: !Ref ProjectName
               RunOrder: 1
+              
+  PipelineWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties: 
+      Authentication: "UNAUTHENTICATED"
+      AuthenticationConfiguration: {}
+      Filters: 
+        - JsonPath: "$.ref"
+          MatchEquals: "refs/heads/{Branch}"
+      Name: !Sub "${ProjectName}-codePipelineWebhook"
+      TargetAction: "SourceCode"
+      TargetPipeline: !Ref CodePipeline
+      TargetPipelineVersion: !GetAtt CodePipeline.Version
 
   CodePipelineRole:
     Type: AWS::IAM::Role
