@@ -27,7 +27,7 @@ Resources:
       AuthenticationConfiguration: {}
       Filters: 
         - JsonPath: "$.ref"
-          MatchEquals: !Sub "refs/heads/${BranchName}"
+          MatchEquals: "refs/heads/{Branch}"
       Name: !Sub "${ProjectName}-codePipelineWebhook"
       TargetAction: "SourceCode"
       TargetPipeline: !Ref CodePipeline
