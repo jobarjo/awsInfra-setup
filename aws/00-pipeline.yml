@@ -29,7 +29,6 @@ Resources:
         - JsonPath: "$.ref"
           MatchEquals: !Sub "refs/heads/${BranchName}"
       Name: !Sub "${ProjectName}-codePipelineWebhook"
-      RegisterWithThirdParty: true
       TargetAction: "SourceCode"
       TargetPipeline: !Ref CodePipeline
       TargetPipelineVersion: !GetAtt CodePipeline.Version
