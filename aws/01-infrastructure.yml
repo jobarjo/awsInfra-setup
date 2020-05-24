@@ -22,9 +22,6 @@ Mappings:
       CIDR: '10.0.2.0/24'
 
 Resources:
-  ## NETWORKING
-  # Setup networking resources for the public subnets.
-
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -32,7 +29,7 @@ Resources:
       EnableDnsHostnames: true
       CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
 
-  # We distribute the subnets across the first three available subnets for the region, for high availability.
+  # distribution across the first three available subnets for the region
   PublicSubnetOne:
     Type: AWS::EC2::Subnet
     Properties:
@@ -106,9 +103,6 @@ Resources:
       SubnetId: !Ref PublicSubnetThree
       RouteTableId: !Ref PublicRouteTable
 
-# These are the values output by the CloudFormation template. Be careful
-# about changing any of them, because of them are exported with specific
-# names so that the other task related CF templates can use them.
 Outputs:
   VPCId:
     Description: The ID of the VPC that this stack is deployed in

@@ -39,4 +39,4 @@ None.
 
 * Pipeline.yml
   - Create a machine user to limit access to github
-  - webhook: secure webhook from [github](https://developer.github.com/webhooks/securing/)
+  - use secret manager for github token
