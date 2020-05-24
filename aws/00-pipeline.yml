@@ -1,11 +1,11 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: "be-infrastructure-networking deployment pipeline"
+Description: "be-awsInfra-networking deployment pipeline"
 
 Parameters:
   ProjectName:
     Type: String
-    Default: "be-infrastructure-networking"
+    Default: "be-awsInfra-networking"
   BranchName:
     Type: String
     Description: "The dev / deployment environment"
@@ -14,7 +14,7 @@ Parameters:
       - "master"
   Repo:
     Type: String
-    Default: "be-infrastructure-networking"
+    Default: "be-awsInfra-networking"
   GithubOAuthToken:
     Description: "The github OAUTH token to give codepipeline access to the gihub repo. To be provided when launching pipeline on the CLI - see https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html" 
     Type: String
@@ -29,6 +29,7 @@ Resources:
         - JsonPath: "$.ref"
           MatchEquals: !Sub "refs/heads/${BranchName}"
       Name: !Sub "${ProjectName}-codePipelineWebhook"
+      RegisterWithThirdParty: true
       TargetAction: "SourceCode"
       TargetPipeline: !Ref CodePipeline
       TargetPipelineVersion: !GetAtt CodePipeline.Version
@@ -71,7 +72,7 @@ Resources:
                 Version: "1"
               Configuration:
                 ActionMode: CREATE_UPDATE
-                StackName: !Sub "${ProjectName}-infrastructure"
+                StackName: !Sub "${ProjectName}-infra"
                 TemplatePath: !Sub "${ProjectName}::aws/01-infrastructure.yml"
                 RoleArn: !GetAtt DeployRole.Arn
               InputArtifacts:

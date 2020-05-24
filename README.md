@@ -1,4 +1,4 @@
-# be-infrastructure-networking
+# be-awsInfra-networking
 
 Build AWS networking components that can be reused by other projects.
 
