@@ -31,11 +31,6 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
-      Tags:
-        - Key: CreatedBy
-          Value: joelbarenco
-        - Key: WEWE
-          Value: wewe
 
   # We distribute the subnets across the first three available subnets for the region, for high availability.
   PublicSubnetOne:
